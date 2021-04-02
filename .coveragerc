@@ -1,0 +1,10 @@
+[run]
+data_file = .coverage/.coverage
+omit = *migrations*
+
+[paths]
+source = hermes
+
+[report]
+show_missing = true
+skip_covered = true

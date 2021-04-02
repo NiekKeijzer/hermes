@@ -1,0 +1,12 @@
+#!/bin/bash
+set -o errexit
+set -o pipefail
+set -o nounset
+
+# Before application start
+python manage.py compress --force
+python /app/manage.py collectstatic --no-input
+python /app/manage.py migrate --no-input
+
+# Start application
+gunicorn meals.asgi --bind 0.0.0.0:$PORT --chdir=/app -k uvicorn.workers.UvicornWorker

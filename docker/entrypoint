@@ -1,0 +1,13 @@
+#!/bin/bash
+set -o errexit
+set -o pipefail
+set -o nounset
+
+until /opt/poetry/bin/poetry run python manage.py database_ready
+do
+ >&2 echo 'Waiting for database to become available...'
+ sleep 1
+done
+>&2 echo 'Database is available!'
+
+exec "$@"
