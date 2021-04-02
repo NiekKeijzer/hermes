@@ -1,5 +1,3 @@
-import secrets
-from types import MethodType
 from typing import Any, List
 
 from django.contrib.auth.base_user import BaseUserManager
@@ -7,7 +5,6 @@ from django.contrib.auth.models import (
     AbstractBaseUser,
     AbstractUser,
     Group,
-    GroupManager,
     PermissionsMixin,
 )
 from django.db import models
@@ -17,7 +14,7 @@ from django.utils.translation import gettext_lazy as _
 
 class CustomUserManager(BaseUserManager):
     def create_user(
-            self, *, email: str, password: str = None, **extra_fields: Any
+        self, *, email: str, password: str = None, **extra_fields: Any
     ) -> "CustomUser":
         if not email:
             raise ValueError(_("Email must be set"))
@@ -35,7 +32,7 @@ class CustomUserManager(BaseUserManager):
         return user
 
     def create_superuser(
-            self, *, email: str, password: str = None, **extra_fields: Any
+        self, *, email: str, password: str = None, **extra_fields: Any
     ) -> "CustomUser":
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)

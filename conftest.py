@@ -1,8 +1,8 @@
-import pytest
-import shutil
 import datetime
+import shutil
 from typing import Any, Generator
 
+import pytest
 from django.conf import settings
 
 

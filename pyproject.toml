@@ -43,6 +43,26 @@ django-debug-toolbar = "3.2"
 curlylint = "0.12.2"
 pytest-mock = "^3.5.1"
 
+[tool.black]
+line-length = 88
+target-version = ['py38']
+exclude = '''
+(
+/(
+   \.eggs         # exclude a few common directories in the
+ | \.git          # root of the project
+ | \.mypy_cache
+ | \.venv
+ | build
+ | dist
+)/
+)
+'''
+
+[tool.isort]
+profile = "black"
+known_third_party = ["decouple", "dj_database_url", "django", "django_cache_url", "pytest"]
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
