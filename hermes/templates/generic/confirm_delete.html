@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% blocktrans %}
+        Delete {{ object }}
+    {% endblocktrans %}
+{% endblock %}
+
+{% block content %}
+    <p>
+        {% blocktrans %}
+            This will permanently delete {{ object }}, are you sure this is what you
+            want?
+        {% endblocktrans %}
+    </p>
+
+    <form method="POST"
+          id="confirm-delete">
+        {% csrf_token %}
+    </form>
+
+{% endblock %}
+
+{% block buttons %}
+    <button class="btn btn-danger" type="submit"
+            form="confirm-delete" name="action">
+        <i class="fas fa-trash" aria-hidden="true"></i>
+        {% trans "Delete" %}
+    </button>
+{% endblock %}
