@@ -1,0 +1,18 @@
+version: 2
+
+updates:
+  - package-ecosystem: poetry
+    directory: /
+    schedule:
+      interval: daily
+    labels:
+      - maintenance
+      - dependencies
+
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: daily
+    labels:
+      - maintenance
+      - dependencies
