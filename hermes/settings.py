@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     # Custom
     "hermes.core",
     "hermes.users",
+    "hermes.forms",
 ]
 
 if DEBUG:
