@@ -1,0 +1,110 @@
+{% extends "account/base.html" %}
+
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block head_title %}{% trans "Account" %}{% endblock %}
+
+{% block title %}
+    {% trans "Account" %}
+{% endblock %}
+
+{% block content %}
+
+    {% if user.emailaddress_set.all %}
+        <p>{% trans 'The following e-mail addresses are associated with your account:' %}</p>
+
+        <form action="{% url 'account_email' %}" class="email_list"
+              method="post">
+            {% csrf_token %}
+            <fieldset class="blockLabels">
+                {% for emailaddress in user.emailaddress_set.all %}
+                    <div class="ctrlHolder form-group">
+                        <label for="email_radio_{{ forloop.counter }}"
+                               class="email {% if emailaddress.primary %}primary_email{% endif %}">
+
+                            <input id="email_radio_{{ forloop.counter }}"
+                                   type="radio" name="email"
+                                   {% if emailaddress.primary or user.emailaddress_set.count == 1 %}checked="checked"{% endif %}
+                                   value="{{ emailaddress.email }}"/>
+
+                            {{ emailaddress.email }}
+                            {% if emailaddress.verified %}
+                                <span class="label label-success verified">{% trans "Verified" %}</span>
+                            {% else %}
+                                <span class="label label-danger unverified">{% trans "Unverified" %}</span>
+                            {% endif %}
+                            {% if emailaddress.primary %}
+                                <span class="label label-info primary">{% trans "Primary" %}</span>{% endif %}
+                        </label>
+                    </div>
+                {% endfor %}
+
+                <div class="btn btn-group">
+                    <button class="btn btn-primary secondaryAction"
+                            type="submit"
+                            name="action_primary">
+                        {% if message.primary %}
+                            <i class="far fa-star"></i>
+                        {% else %}
+                            <i class="fas fa-star"></i>
+                        {% endif %}
+
+                        {% trans 'Make Primary' %}
+                    </button>
+                    <button class="btn btn-info secondaryAction"
+                            type="submit"
+                            name="action_send">
+                        <i class="far fa-paper-plane"></i>
+                        {% trans 'Re-send Verification' %}
+                    </button>
+                    <button class="btn btn-danger primaryAction" type="submit"
+                            name="action_remove">
+                        <i class="fas fa-trash"></i>
+                        {% trans 'Remove' %}
+                    </button>
+                </div>
+
+            </fieldset>
+        </form>
+
+    {% else %}
+        <p>
+            <strong>{% trans 'Warning:' %}</strong> {% trans "You currently do not have any e-mail address set up. You should really add an e-mail address so you can receive notifications, reset your password, etc." %}
+        </p>
+
+    {% endif %}
+
+    <hr>
+
+    <h3>{% trans "Add email address" %}</h3>
+
+    <form method="post" action="{% url 'account_email' %}" class="add_email">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button class="btn btn-primary mt-3"
+                name="action_add"
+                type="submit">
+            <i class="fas fa-plus"></i>
+            {% trans "Add E-mail" %}
+        </button>
+    </form>
+
+{% endblock %}
+
+
+{% block extra_body %}
+    <script type="text/javascript">
+        (function () {
+            var message = "{% trans 'Do you really want to remove the selected e-mail address?' %}";
+            var actions = document.getElementsByName('action_remove');
+            if (actions.length) {
+                actions[0].addEventListener("click", function (e) {
+                    if (!confirm(message)) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        })();
+    </script>
+{% endblock %}
