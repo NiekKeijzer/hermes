@@ -14,6 +14,7 @@ class AssignUserMixin(FormMixin):
             pass
 
         instance.save()
+        self.object = instance
 
         return HttpResponseRedirect(self.get_success_url())
 
