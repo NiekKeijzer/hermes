@@ -3,4 +3,4 @@ from django.views.generic import RedirectView
 
 
 class IndexView(LoginRequiredMixin, RedirectView):
-    pattern_name = "form-list"
+    pattern_name = "site-list"
