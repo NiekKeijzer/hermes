@@ -1,12 +1,15 @@
-from typing import Any, Type
+from typing import Any, Optional, Type
 
 from django import forms
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages import info
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
+from django.views.generic import RedirectView
+from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
@@ -31,6 +34,9 @@ class SiteCreateView(LoginRequiredMixin, UserSiteMixin, AssignUserMixin, CreateV
 
         return super().form_valid(form)
 
+    def get_success_url(self):
+        return reverse("form-list", kwargs={"site_pk": self.object.pk})
+
 
 class SiteUpdateView(LoginRequiredMixin, UserSiteMixin, UpdateView):
     model = Site
@@ -52,8 +58,7 @@ class FormCreateView(
 ):
     model = Form
     form_class = FormForm
-
-    success_url = reverse_lazy("form-list")
+    template_name = "forms/form_create.html"
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if not Site.objects.filter(user=request.user).count():
@@ -70,11 +75,29 @@ class FormCreateView(
 
     def get_form(self, form_class: Type[FormForm] = None) -> FormForm:
         form = super().get_form(form_class=form_class)
-        if site_pk := self.kwargs.get("site_pk"):
-            site = Site.objects.get(pk=site_pk)
-            form.initial["site"] = site
+        form.initial["site"] = self.get_site()
 
         return form
+
+    def get_success_url(self) -> str:
+        return reverse(
+            "form-update",
+            kwargs={"pk": self.object.pk, "site_pk": self.kwargs.get("site_pk")},
+        )
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        ctx = super().get_context_data(object_list=object_list, **kwargs)
+        ctx["site"] = self.get_site()
+
+        return ctx
+
+    def get_site(self) -> Optional[Site]:
+        if site_pk := self.kwargs.get("site_pk"):
+            site = Site.objects.get(pk=site_pk)
+        else:
+            site = None
+
+        return site
 
 
 class FormUpdateView(
@@ -83,8 +106,40 @@ class FormUpdateView(
     model = Form
     form_class = FormForm
 
+    def get_context_data(self, **kwargs) -> dict:
+        ctx = super().get_context_data(**kwargs)
+
+        form: Form = self.get_object()
+        paginator = Paginator(form.submission_set.order_by("received_at"), 10)
+
+        try:
+            page = paginator.page(self.request.GET.get("page"))
+        except PageNotAnInteger:
+            page = paginator.page(1)
+        except EmptyPage:
+            page = paginator.page(paginator.num_pages)
+
+        ctx.update(
+            {
+                "submission_list": page,
+                "columns": set().union(
+                    *(submission.data.keys() for submission in page)
+                ),
+            }
+        )
+
+        return ctx
+
 
 class FormDeleteView(LoginRequiredMixin, UserFormMixin, DeleteView):
     model = Form
     template_name = "generic/confirm_delete.html"
-    success_url = reverse_lazy("form-list")
+
+    def get_success_url(self) -> str:
+        return reverse("form-list", kwargs={"site_pk": self.kwargs.get("site_pk")})
+
+
+class FormSubmissionView(RedirectView):
+    def get(self, request: HttpRequest, *args, **kwargs):
+        # TODO: Handle form submission
+        pass

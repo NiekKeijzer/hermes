@@ -1,0 +1,29 @@
+{% load i18n %}
+{% load crispy_forms_filters %}
+
+<h2>{% trans "Basic settings" %}</h2>
+
+<form method="POST"
+      id="form-edit">
+    {% csrf_token %}
+    {{ form | crispy }}
+</form>
+
+<button class="btn btn-primary mt-3" type="submit"
+        form="site-edit" name="action">
+    <i class="fas fa-paper-plane" aria-hidden="true"></i>
+    {% trans "Submit" %}
+</button>
+
+<h3 class="mt-5">{% trans "Danger zone" %}</h3>
+
+<p>
+    {% blocktrans %}
+        This will permanently delete this form and all it's submissions.
+    {% endblocktrans %}
+</p>
+
+<a class="btn btn-danger" href="{% url "form-delete" pk=object.pk site_pk=object.site.pk %}">
+    <i class="fas fa-trash" aria-hidden="true"></i>
+    {% trans "Delete form" %}
+</a>

@@ -22,6 +22,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("allauth.urls")),
     path("sites/", include("hermes.forms.urls")),
+    path("f/", include("hermes.forms.urls_submission")),
     path("", include("hermes.core.urls")),
 ]
 

@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractBaseUser
+from django.utils.translation import gettext_lazy as _
 
 from .models import Form, Site
 
@@ -23,4 +24,7 @@ class FormForm(forms.ModelForm):
 
     class Meta:
         model = Form
-        fields = ["name", "enabled", "site"]
+        fields = ["name", "site", "enabled"]
+        help_texts = {
+            "enabled": _("Submissions to a disabled form will not be processed")
+        }
