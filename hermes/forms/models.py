@@ -8,7 +8,7 @@ User = get_user_model()
 
 class Site(models.Model):
     name = models.CharField(max_length=255, db_index=True)
-    domain = models.CharField(max_length=255, null=True, blank=True)
+    url = models.CharField(max_length=255, null=True, blank=True)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
@@ -21,6 +21,9 @@ class Form(models.Model):
 
     name = models.CharField(max_length=255, db_index=True)
     enabled = models.BooleanField(default=True)
+
+    validate_referrer = models.BooleanField(default=True)
+    redirect_url = models.URLField(blank=True, null=True)
 
     site = models.ForeignKey(Site, on_delete=models.SET_NULL, null=True)
 

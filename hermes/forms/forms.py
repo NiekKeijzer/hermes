@@ -9,9 +9,11 @@ User: AbstractBaseUser = get_user_model()
 
 
 class SiteForm(forms.ModelForm):
+    url = forms.URLField()
+
     class Meta:
         model = Site
-        fields = ["name", "domain"]
+        fields = ["name", "url"]
 
 
 class FormForm(forms.ModelForm):
@@ -24,7 +26,11 @@ class FormForm(forms.ModelForm):
 
     class Meta:
         model = Form
-        fields = ["name", "site", "enabled"]
+        fields = ["name", "site", "enabled", "validate_referrer", "redirect_url"]
         help_texts = {
-            "enabled": _("Submissions to a disabled form will not be processed")
+            "enabled": _("Submissions to a disabled form will not be processed"),
+            "validate_referrer": _(""),
+            "redirect_url": _(
+                "If none is specified, user will be redirected to where they came from"
+            ),
         }

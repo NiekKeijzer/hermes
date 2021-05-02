@@ -5,19 +5,23 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages import info
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import RedirectView
-from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
+from django_q.tasks import async_task
 
 from hermes.generic.mixins import AssignUserMixin, UserFormKwargsMixin
 
+from .decorators import validate_referrer
 from .forms import FormForm, SiteForm
 from .mixins import SiteFormMixin, UserFormMixin, UserSiteMixin
-from .models import Form, Site
+from .models import Form, Site, Submission
+from .utils import sanitize_and_flatten
 
 
 class SiteListView(LoginRequiredMixin, UserSiteMixin, ListView):
@@ -110,7 +114,7 @@ class FormUpdateView(
         ctx = super().get_context_data(**kwargs)
 
         form: Form = self.get_object()
-        paginator = Paginator(form.submission_set.order_by("received_at"), 10)
+        paginator = Paginator(form.submission_set.order_by("-received_at"), 10)
 
         try:
             page = paginator.page(self.request.GET.get("page"))
@@ -139,7 +143,22 @@ class FormDeleteView(LoginRequiredMixin, UserFormMixin, DeleteView):
         return reverse("form-list", kwargs={"site_pk": self.kwargs.get("site_pk")})
 
 
+@method_decorator(csrf_exempt, name="dispatch")
+@method_decorator(validate_referrer, name="dispatch")
 class FormSubmissionView(RedirectView):
-    def get(self, request: HttpRequest, *args, **kwargs):
-        # TODO: Handle form submission
-        pass
+    def get(
+        self, request: HttpRequest, hash: str = None, *args, **kwargs
+    ) -> HttpResponseRedirect:
+        form = get_object_or_404(Form, hash__exact=hash, enabled=True)
+
+        data = dict(request.POST or request.GET)
+        submission = Submission.objects.create(
+            form=form, data=sanitize_and_flatten(data)
+        )
+
+        async_task("hermes.forms.tasks.dispatch_submission_received", submission)
+
+        return HttpResponseRedirect(self.get_success_url(form))
+
+    def get_success_url(self, form: Form) -> str:
+        return form.redirect_url or self.request.META.get("HTTP_REFERER", form.site.url)

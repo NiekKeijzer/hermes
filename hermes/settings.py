@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.sites",
     # Third party
+    "django_q",
     "compressor",
     "crispy_forms",
     "allauth",
