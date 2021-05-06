@@ -1,0 +1,162 @@
+{% extends "email/base.html" %}
+
+{% load i18n %}
+{% load core %}
+
+{% block body %}
+    {% block content %}
+        <!-- big image section -->
+
+        <table border="0" width="100%" cellpadding="0" cellspacing="0"
+               bgcolor="ffffff" class="bg_color">
+
+            <tr>
+                <td align="center">
+                    <table border="0" align="center" width="590"
+                           cellpadding="0"
+                           cellspacing="0" class="container590">
+
+                        <tr>
+                            <td align="center"
+                                style="color: #343434; font-size: 24px; font-family: Quicksand, Calibri, sans-serif; font-weight:700;letter-spacing: 3px; line-height: 35px;"
+                                class="main-header">
+                                <!-- section text ======-->
+
+                                <div style="line-height: 35px">
+                                    {% if subject %}
+                                        {{ subject }}
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td height="10"
+                                style="font-size: 10px; line-height: 10px;">
+                                &nbsp;
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td align="center">
+                                <table border="0" width="40" align="center"
+                                       cellpadding="0" cellspacing="0"
+                                       bgcolor="eeeeee">
+                                    <tr>
+                                        <td height="2"
+                                            style="font-size: 2px; line-height: 2px;">
+                                            &nbsp;
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td height="20"
+                                style="font-size: 20px; line-height: 20px;">
+                                &nbsp;
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td align="left">
+                                <table border="0" width="590" align="center"
+                                       cellpadding="0" cellspacing="0"
+                                       class="container590">
+                                    <tr>
+                                        <td align="left"
+                                            style="color: #888888; font-size: 16px; font-family: 'Work Sans', Calibri, sans-serif; line-height: 24px;">
+                                            {% block content_inner %}
+                                                {{ text }}
+                                            {% endblock %}
+
+                                            {% captureas cta %}{% spaceless %}
+                                                {% block call_to_action %}
+                                                {% endblock %}
+                                            {% endspaceless %}{% endcaptureas %}
+
+                                            {% if cta %}
+                                                <table border="0"
+                                                       align="center"
+                                                       width="180"
+                                                       cellpadding="0"
+                                                       cellspacing="0"
+                                                       bgcolor="5caad2"
+                                                       style="margin-bottom:20px;">
+
+                                                    <tr>
+                                                        <td height="10"
+                                                            style="font-size: 10px; line-height: 10px;">
+                                                            &nbsp;
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td align="center"
+                                                            style="color: #ffffff; font-size: 14px; font-family: 'Work Sans', Calibri, sans-serif; line-height: 22px; letter-spacing: 2px;">
+                                                            <!-- main section button -->
+
+                                                            <div style="line-height: 22px;">
+                                                                {{ cta }}
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td height="10"
+                                                            style="font-size: 10px; line-height: 10px;">
+                                                            &nbsp;
+                                                        </td>
+                                                    </tr>
+
+                                                </table>
+                                            {% else %}
+                                                <table>
+                                                    <tr>
+                                                        <td height="20"
+                                                            style="font-size: 20px; line-height: 20px;">
+                                                            &nbsp;
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            {% endif %}
+
+                                            <p style="line-height: 24px">
+                                                {% blocktrans %}
+                                                    Cheers,</br>
+                                                    - The Hermes team
+                                                {% endblocktrans %}
+                                            </p>
+
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+
+
+                    </table>
+
+                </td>
+            </tr>
+        </table>
+
+        <!-- end section -->
+    {% endblock %}
+
+    {% captureas feature %}{% spaceless %}{% block feature %}{% endblock %}
+    {% endspaceless %}{% endcaptureas %}
+
+    {% if feature %}
+        <table>
+            <tr>
+                <td height="40" style="font-size: 40px; line-height: 40px;">
+                    &nbsp;
+                </td>
+            </tr>
+        </table>
+
+        {{ feature }}
+    {% endif %}
+{% endblock %}

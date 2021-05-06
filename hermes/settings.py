@@ -63,6 +63,8 @@ INSTALLED_APPS = [
     "hermes.core",
     "hermes.users",
     "hermes.forms",
+    # Hooks
+    "hermes.hooks.mail",
 ]
 
 if DEBUG:

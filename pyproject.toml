@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "hermes"
 version = "0.1.0"
-description = "Formspree, but self hosted"
+description = "Self hosted form receiver"
 authors = ["Niek Keijzer <info@niekkeijzer.com>"]
 license = "MIT"
 
@@ -62,7 +62,7 @@ exclude = '''
 
 [tool.isort]
 profile = "black"
-known_third_party = ["bleach", "decouple", "dj_database_url", "django", "django_cache_url", "django_q", "pytest"]
+known_third_party = ["bleach", "decouple", "dj_database_url", "django", "django_cache_url", "django_q", "html2text", "pytest"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

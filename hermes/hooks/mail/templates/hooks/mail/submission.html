@@ -1,0 +1,38 @@
+{% extends "email/text.html" %}
+
+{% load i18n %}
+
+{% block content_inner %}
+    {% blocktrans with site=submission.form.site received_at=submission.received_at %}
+        The following submission was received on <em>{{ site }}</em> at
+        <em>{{ received_at }}</em>
+    {% endblocktrans %}
+
+    {% include "email/includes/spacing.html" %}
+
+    <table>
+        <tbody>
+        {% for key, value in submission.data.items %}
+            <tr>
+                <td>
+                    <strong>{{ key }}:</strong>
+                </td>
+                <td>
+                    {{ value|truncatewords:25 }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% include "email/includes/spacing.html" %}
+{% endblock %}
+
+{% block call_to_action %}
+    {% url "form-update" pk=submission.form.pk site_pk=submission.form.site.pk as submission_url %}
+    {% blocktrans %}
+        <a href="{{ submission_url }}" style="color: #ffffff; text-decoration: none;">
+            VIEW ONLINE
+        </a>
+    {% endblocktrans %}
+{% endblock %}

@@ -2,13 +2,14 @@ from typing import Any, Optional, Type
 
 from django import forms
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.messages import info
+from django.contrib.messages import error, info, success
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
+from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import RedirectView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
@@ -16,6 +17,7 @@ from django.views.generic.list import ListView
 from django_q.tasks import async_task
 
 from hermes.generic.mixins import AssignUserMixin, UserFormKwargsMixin
+from hermes.hooks import HookConfig
 
 from .decorators import validate_referrer
 from .forms import FormForm, SiteForm
@@ -129,6 +131,11 @@ class FormUpdateView(
                 "columns": set().union(
                     *(submission.data.keys() for submission in page)
                 ),
+                "hooks": {app.name: app for app in HookConfig.get_hooks()},
+                "hook_forms": {
+                    app.name: app.get_settings_form(form=form)
+                    for app in HookConfig.get_hooks()
+                },
             }
         )
 
@@ -141,6 +148,43 @@ class FormDeleteView(LoginRequiredMixin, UserFormMixin, DeleteView):
 
     def get_success_url(self) -> str:
         return reverse("form-list", kwargs={"site_pk": self.kwargs.get("site_pk")})
+
+
+class FormHookSettingsView(LoginRequiredMixin, UserFormMixin, View):
+    def get(self, request: HttpRequest, **kwargs):
+        return redirect(self.get_redirect_url())
+
+    def post(self, request: HttpRequest, **kwargs):
+        try:
+            hook = HookConfig.get_hook(request.GET.get("hook", None))
+        except LookupError:
+            raise Http404()
+
+        form_object = self.get_form()
+        form = hook.get_settings_form(
+            form=form_object,
+            data=request.POST,
+        )
+        if form.is_valid():
+            form.save()
+
+            success(request, _("Hook saved successfully"))
+        else:
+            error(request, _("Correct the errors and try again"))
+
+        return redirect(self.get_redirect_url())
+
+    def get_form(self) -> Form:
+        return get_object_or_404(Form, pk=self.kwargs.get("pk"))
+
+    def get_redirect_url(self, fragment: str = "hooks") -> str:
+        url = reverse(
+            "form-update",
+            kwargs={"pk": self.kwargs.get("pk"), "site_pk": self.kwargs.get("site_pk")},
+        )
+        url += f"#{fragment}"
+
+        return url
 
 
 @method_decorator(csrf_exempt, name="dispatch")

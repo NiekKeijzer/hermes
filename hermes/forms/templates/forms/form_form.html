@@ -6,7 +6,7 @@
 
 {% block extra_head %}
     <link rel="stylesheet"
-      href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.7.2/build/styles/default.min.css">
+          href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.7.2/build/styles/default.min.css">
     <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.7.2/build/highlight.min.js"></script>
     <script>hljs.highlightAll()</script>
 {% endblock %}
@@ -22,16 +22,18 @@
     <div class="row">
         <div class="col-12">
             <div class="float-end mt-3 mb-5">
-                <a href="{% url "site-create" %}" class="btn btn-primary">
-                    <i class="fas fa-plus" aria-hidden="true"></i>
-                    {% trans "Add a new site" %}
-                </a>
+                <div class="btn-group">
+                    <a href="{% url "site-create" %}" class="btn btn-primary">
+                        <i class="fas fa-plus" aria-hidden="true"></i>
+                        {% trans "Add a new site" %}
+                    </a>
 
-                <a href="{% url "form-site-create" site_pk=site.pk %}"
-                   class="btn btn-primary">
-                    <i class="fas fa-plus" aria-hidden="true"></i>
-                    {% trans "Add a new form" %}
-                </a>
+                    <a href="{% url "form-site-create" site_pk=site.pk %}"
+                       class="btn btn-primary">
+                        <i class="fas fa-plus" aria-hidden="true"></i>
+                        {% trans "Add a new form" %}
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -129,7 +131,7 @@
                         role="tabpanel"
                         aria-labelledby="tab-hooks"
                 >
-                    {% trans "Coming soon" %}
+                    {% include "forms/tabs/hooks.html" %}
                 </div>
             </div>
         </div>

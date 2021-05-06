@@ -26,4 +26,9 @@ urlpatterns = [
         views.FormDeleteView.as_view(),
         name="form-delete",
     ),
+    path(
+        "<int:site_pk>/forms/<int:pk>/settings/",
+        views.FormHookSettingsView.as_view(),
+        name="form-hook-settings",
+    ),
 ]
