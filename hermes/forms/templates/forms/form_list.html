@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block title %}
+    {% blocktrans %}
+        Forms of {{ site }}
+    {% endblocktrans %}
+{% endblock %}
+
+{% block content %}
+
+    <div class="mt-3 mb-5">
+        <a href="{% url "site-list" %}">
+            <i class="fas fa-angle-left"></i>
+            {% trans "See all sites" %}
+        </a>
+
+        <div class="float-end">
+            <a href="{% url "site-create" %}" class="btn btn-primary">
+                <i class="fas fa-plus" aria-hidden="true"></i>
+                {% trans "Add a new site" %}
+            </a>
+
+            <a href="{% url "form-site-create" site_pk=site.pk %}"
+               class="btn btn-primary">
+                <i class="fas fa-plus" aria-hidden="true"></i>
+                {% trans "Add a new form" %}
+            </a>
+        </div>
+    </div>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>
+                {% trans "Name" %}
+            </th>
+            <th>
+                {% trans "Enabled" %}
+            </th>
+            <th>
+                {% trans "Actions" %}
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for form in object_list %}
+            <tr>
+                <td>{{ form.name }}</td>
+                <td>
+                    <label for="enabled_{{ form.pk }}" class="sr-only">
+                        {% if form.enabled %}
+                            {% blocktrans %}
+                                Form {{ form }} is enabled
+                            {% endblocktrans %}
+                        {% else %}
+                            Form {{ form }} is not enabled
+                        {% endif %}
+                    </label>
+                    <input type="checkbox"
+                           id="enabled_{{ form.pk }}"
+                           checked="{% if form.enabled %}checked{% endif %}"
+                           class="form-check-input"
+                           disabled
+                    >
+                </td>
+                <td>
+                    <a class="btn btn-outline-primary"
+                       href="{% url "form-update" pk=form.pk site_pk=site.pk %}">
+                        <span class="sr-only">
+                            {% blocktrans %}
+                                Update form {{ form }}
+                            {% endblocktrans %}
+                        </span>
+                        <i class="fas fa-eye" aria-hidden="true"></i>
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+
+{% endblock %}

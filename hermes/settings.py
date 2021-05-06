@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.sites",
     # Third party
+    "django_q",
     "compressor",
     "crispy_forms",
     "allauth",
@@ -61,6 +62,9 @@ INSTALLED_APPS = [
     # Custom
     "hermes.core",
     "hermes.users",
+    "hermes.forms",
+    # Hooks
+    "hermes.hooks.mail",
 ]
 
 if DEBUG:

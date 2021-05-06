@@ -1,0 +1,55 @@
+{% load i18n %}
+{% load crispy_forms_filters %}
+{% load core %}
+
+{% for hook_name, f in hook_forms.items %}
+    {% with hook=hooks|dict_key:hook_name %}
+        <div
+                class="modal fade"
+                id="{{ hook_name|slugify }}"
+                tabindex="-1"
+                aria-labelledby="hook-settings-modal-{{ forloop.counter0 }}-title"
+                aria-hidden="true"
+        >
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"
+                            id="hook-settings-modal-{{ forloop.counter0 }}-title">{{ hook.verbose_name }}</h5>
+                        <button
+                                type="button"
+                                class="btn-close"
+                                data-mdb-dismiss="modal"
+                                aria-label="{% trans "Close" %}"
+                        ></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="hook-settings-form-{{ forloop.counter0 }}" method="post" action="{% url "form-hook-settings" pk=object.pk site_pk=object.site.pk %}?hook={{ hook.name }}">
+                            {% csrf_token %}
+                            {{ f | crispy }}
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit"
+                                class="btn btn-primary"
+                                form="hook-settings-form-{{ forloop.counter0 }}"
+                        >
+                            {% trans "Save changes" %}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-12">
+            <button
+                    type="button"
+                    class="btn btn-lg btn-outline-primary btn-block p-3"
+                    data-mdb-toggle="modal"
+                    data-mdb-target="#{{ hook_name|slugify }}"
+            >
+                {{ hook.verbose_name }}
+            </button>
+        </div>
+    {% endwith %}
+{% endfor %}

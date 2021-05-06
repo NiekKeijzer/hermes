@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <form method="POST"
+          id="site-edit">
+        {% csrf_token %}
+        {{ form | crispy }}
+    </form>
+
+{% endblock %}
+
+{% block buttons %}
+    <button class="btn btn-primary" type="submit"
+            form="site-edit" name="action">
+        <i class="fas fa-paper-plane" aria-hidden="true"></i>
+        {% trans "Submit" %}
+    </button>
+{% endblock %}

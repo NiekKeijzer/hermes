@@ -21,6 +21,9 @@ from django.urls import include, path
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("allauth.urls")),
+    path("sites/", include("hermes.forms.urls")),
+    path("f/", include("hermes.forms.urls_submission")),
+    path("", include("hermes.core.urls")),
 ]
 
 
@@ -28,4 +31,9 @@ if settings.DEBUG:
     import debug_toolbar
 
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns.extend([path("__debug__/", include(debug_toolbar.urls))])
+    urlpatterns.extend(
+        [
+            path("__debug__/", include(debug_toolbar.urls)),
+            path("__debug__/", include("hermes.debug.urls")),
+        ]
+    )

@@ -1,0 +1,113 @@
+{% load i18n %}
+{% load core %}
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>{% trans "Received at" %}</th>
+        {% for column in columns %}
+            <th {% if forloop.counter0 >= 2 %}class="d-none"{% endif %}>{{ column }}</th>
+        {% endfor %}
+        <th>{% trans "Actions" %}</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    {% for submission in submission_list %}
+        <tr>
+            <td>{{ submission.received_at }}</td>
+
+            {% for column in columns %}
+                <td {% if forloop.counter0 >= 2 %}class="d-none"{% endif %}>{{ submission.data|dict_key:column }}</td>
+            {% endfor %}
+
+            <td>
+                <button
+                        type="button"
+                        class="btn btn-outline-primary"
+                        data-mdb-toggle="modal"
+                        data-mdb-target="#submission-modal-{{ forloop.counter0 }}"
+                >
+                                            <span class="sr-only">
+                                                {% blocktrans %}
+                                                    Details of {{ object }}
+                                                {% endblocktrans %}
+                                            </span>
+
+                    <i class="fas fa-eye" aria-hidden="true"></i>
+
+                </button>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% if submission_list.has_other_pages %}
+    <small>
+        {% blocktrans with number=submission_list.number num_pages=submission_list.paginator.num_pages %}
+            Page {{ number }} of {{ num_pages }}
+        {% endblocktrans %}
+    </small>
+
+
+    <div class="float-end">
+        {% if submission_list.has_previous %}
+            <a href="{% url "form-update" site_pk=object.site.pk pk=object.pk %}?page={{ submission_list.previous_page_number }}#submissions">
+                {% trans "Previous" %}
+            </a>
+        {% endif %}
+
+        {% if submission_list.has_next %}
+            <a href="{% url "form-update" site_pk=object.site.pk pk=object.pk %}?page={{ submission_list.next_page_number }}#submissions">
+                {% trans "Next" %}
+            </a>
+        {% endif %}
+    </div>
+{% endif %}
+
+{% for submission in submission_list %}
+    <!-- Modal -->
+    <div
+            class="modal fade"
+            id="submission-modal-{{ forloop.counter0 }}"
+            tabindex="-1"
+            aria-labelledby="exampleModalLabel"
+            aria-hidden="true"
+    >
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">
+                        {% blocktrans with received_at=submission.received_at %}
+                            Received at {{ received_at }}
+                        {% endblocktrans %}
+                    </h5>
+
+                    <button
+                            type="button"
+                            class="btn-close"
+                            data-mdb-dismiss="modal"
+                            aria-label="Close"
+                    ></button>
+                </div>
+
+                <div class="modal-body">
+                    {% for key, value in submission.data.items %}
+                        <dl>
+                            <dt>{{ key }}</dt>
+                            <dd>{{ value }}</dd>
+                        </dl>
+                    {% endfor %}
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary"
+                            data-mdb-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}
